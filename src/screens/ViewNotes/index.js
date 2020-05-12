@@ -6,17 +6,18 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Text,
+  Image,
 } from 'react-native';
 import {FAB, List, Colors} from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {fetchNotes} from '../../redux/actions';
+import {fetchPhotos} from '../../redux/actions';
 
 import Header from '../../components/Header';
 import Button from '../../components/Button';
 
 function ViewNotes({navigation}) {
-  const noteData = useSelector((state) => state.note.noteData.noteData);
+  const photoData = useSelector((state) => state.note.photoData.photoData);
   const dispatch = useDispatch();
   const [isLoadMore, setIsLoadMore] = useState(false);
   const [size, setSize] = useState(1);
@@ -24,7 +25,7 @@ function ViewNotes({navigation}) {
     'ok, we receive data',
   );
   const getData = (size) => {
-    dispatch(fetchNotes(size))
+    dispatch(fetchPhotos(size))
       .then((response) => response.data)
       .catch((err) => {
         setFormErrorMessage('There is no data, or problems with receiving it');
@@ -34,19 +35,19 @@ function ViewNotes({navigation}) {
       });
   };
 
-
   useEffect(() => {
-    console.log('size', size)
-      getData(size);
+    getData(size);
   }, [size]);
 
+  console.log('photoData', photoData);
+
   const footerList = () => {
-    return size > noteData.length ? null : (
+    return size > photoData.length ? null : (
       <View style={styles.footer}>
         <TouchableOpacity
           activeOpacity={0.9}
           style={styles.loadMore}
-          onPress={() =>  setSize(size + 1)}>
+          onPress={() => setSize(size + 1)}>
           <Text style={styles.textBtn}>Load More</Text>
           {isLoadMore ? (
             <ActivityIndicator color="white" size="large" animating />
@@ -60,54 +61,30 @@ function ViewNotes({navigation}) {
     <>
       <Header titleText="Simple Friend list" />
       <View style={styles.container}>
-        {noteData === undefined ? (
+        {photoData === undefined ? (
           <View style={styles.titleContainer}>
-            <ActivityIndicator size="large" color="#60DBC5" />
+            <Text style={{fontSize: 24}}>There is no data</Text>
           </View>
         ) : (
           <FlatList
-            data={noteData}
+            data={photoData}
             ListFooterComponent={footerList}
             renderItem={({item}) => (
-              <List.Section>
-                <List.Accordion
-                  title={`${item.name} ${item.lastname}`}
-                  left={(props) => <List.Icon {...props} icon="account" />}>
-                  <List.Item
-                    left={(props) => <List.Icon {...props} icon="phone" />}
-                    title={`+${item.phone}`}
-                  />
-                  <List.Item
-                    left={(props) => <List.Icon {...props} icon="email" />}
-                    title={item.email}
-                  />
-                  <List.Item
-                    left={(props) => <List.Icon {...props} icon="cake" />}
-                    title={item.birthday}
-                  />
-                </List.Accordion>
-                <View style={styles.inlineBlock}>
-                  <Button
-                    item={item}
-                    navigateTo={() =>
-                      navigation.navigate('UpdateScreen', {
-                        _id: item._id,
-                      })
-                    }
-                  />
-
-                  <Button item={item} Delete />
-                </View>
-              </List.Section>
+              <View style={styles.inlineBlock}>
+                <Image
+                  resizeMode={'contain'}
+                  source={{uri:item.img}}
+                  style={styles.img}
+                />
+              </View>
             )}
             keyExtractor={(item) => item._id.toString()}
           />
         )}
         <FAB
-          icon="plus"
           style={styles.fab}
-          small
           color={Colors.white}
+          label="add new"
           onPress={() => navigation.navigate('AddNotes')}
         />
       </View>
@@ -133,6 +110,7 @@ const styles = StyleSheet.create({
     margin: 20,
     right: 0,
     bottom: 10,
+    fontSize: 16,
   },
   listTitle: {
     fontSize: 20,
@@ -164,6 +142,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginRight: 5,
     color: 'white',
+  },
+  img: {
+    alignSelf: 'stretch',
+    width: '100%',
+    height: 300,
   },
 });
 

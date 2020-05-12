@@ -1,17 +1,22 @@
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {View, StyleSheet, ScrollView, Image, Button, Text} from 'react-native';
-import {IconButton, TextInput, FAB} from 'react-native-paper';
+import {View, StyleSheet, ScrollView, Image, Text} from 'react-native';
+import {IconButton, TextInput, Button, FAB} from 'react-native-paper';
 
 import ImagePicker from 'react-native-image-picker';
 
-import {submitNote, fetchNotes} from '../../redux/actions';
+import {submitPhotos, fetchPhotos} from '../../redux/actions';
+import {Formik} from 'formik';
 
 import Header from '../../components/Header';
 
 function AddNotes({navigation}) {
-  const [avatarSource, setAvatarSource] = useState(null);
+  const [avatarSource, setAvatarSource] = useState(
+    'content://media/external/images/media/24973',
+  );
+  const dispatch = useDispatch();
+
   const selectImage = async () => {
     ImagePicker.showImagePicker(
       {noData: true, mediaType: 'photo'},
@@ -27,20 +32,77 @@ function AddNotes({navigation}) {
         } else {
           // You can also display the image using data:
           // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-          setAvatarSource(response.uri)
+          setAvatarSource(response.uri);
         }
       },
     );
   };
-  console.log('avatarSource', avatarSource)
+
+  console.log('avatarSource', avatarSource);
   return (
     <>
       <Header titleText="Add a new info about friend" />
       <ScrollView style={styles.container}>
         {avatarSource && (
-          <Image source={{uri:avatarSource}} style={{width: '80%', height: 200, resizeMode: 'contain'}} />
+          <Image
+            resizeMode={'contain'}
+            source={{uri: avatarSource}}
+            style={styles.img}
+          />
         )}
-        <Button title="Select Image" onPress={selectImage} />
+        <FAB label="Find Photo" style={styles.fab} onPress={selectImage} />
+
+        <Formik
+          initialValues={{
+            img: avatarSource,
+          }}
+          onSubmit={(values, {setSubmitting}) => {
+            setTimeout(() => {
+              let dataToSubmit = {
+                img: values.img,
+              };
+              dispatch(submitPhotos(dataToSubmit))
+                .then((response) => response.payload)
+                .catch((err) => {
+                  setTimeout(() => {
+                    setFormErrorMessage(
+                      'There is no data, or problems with receiving it',
+                    );
+                  }, 1000);
+                });
+              dispatch(fetchPhotos())
+                .then((response) => response.data)
+                .catch((err) => {
+                  setFormErrorMessage(
+                    'There is no data, or problems with receiving it',
+                  );
+                  setTimeout(() => {
+                    setFormErrorMessage('');
+                  }, 1000);
+                });
+              setSubmitting(false);
+            }, 500);
+          }}>
+          {(props) => {
+            const {touched, errors, isSubmitting, handleSubmit} = props;
+            return (
+              <View>
+                {touched.name && errors.name && (
+                  <Text style={{fontSize: 10, color: 'red'}}>
+                    {errors.name}
+                  </Text>
+                )}
+                <FAB
+                  style={styles.fab}
+                  small
+                  label="apply"
+                  onPress={handleSubmit}
+                  disabled={isSubmitting}
+                />
+              </View>
+            );
+          }}
+        </Formik>
       </ScrollView>
     </>
   );
@@ -73,6 +135,11 @@ const styles = StyleSheet.create({
     margin: 20,
     right: 0,
     bottom: 0,
+  },
+  img: {
+    alignSelf: 'stretch',
+    width: '100%',
+    height: 300,
   },
 });
 
