@@ -59,7 +59,7 @@ function ViewNotes({navigation}) {
 
   return (
     <>
-      <Header titleText="Simple Friend list" />
+      <Header titleText="Photo list" />
       <View style={styles.container}>
         {photoData === undefined ? (
           <View style={styles.titleContainer}>
@@ -76,6 +76,7 @@ function ViewNotes({navigation}) {
                   source={{uri:item.img}}
                   style={styles.img}
                 />
+                <Text>{item.created.match(/\d{4}.\d{2}.\d{2}/)}</Text>
               </View>
             )}
             keyExtractor={(item) => item._id.toString()}
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inlineBlock: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -12,9 +12,7 @@ import {Formik} from 'formik';
 import Header from '../../components/Header';
 
 function AddNotes({navigation}) {
-  const [avatarSource, setAvatarSource] = useState(
-    'content://media/external/images/media/24973',
-  );
+  const [avatarSource, setAvatarSource] = useState();
   const dispatch = useDispatch();
 
   const selectImage = async () => {
@@ -59,7 +57,7 @@ function AddNotes({navigation}) {
           onSubmit={(values, {setSubmitting}) => {
             setTimeout(() => {
               let dataToSubmit = {
-                img: values.img,
+                img: avatarSource,
               };
               dispatch(submitPhotos(dataToSubmit))
                 .then((response) => response.payload)
