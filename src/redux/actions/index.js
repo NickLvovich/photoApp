@@ -1,20 +1,51 @@
 import axios from 'axios';
-import {ADD_PHOTO, DELETE_PHOTO, PHOTO_LIST} from '../types';
+import {ADD_PHOTO, DELETE_PHOTO, PHOTO_LIST, SHOW_ALERT} from '../types';
 
-export async function fetchPhotos(size) {
-  console.log('size', size);
+exportexport async function fetchPosts(size) {
+  console.log('size', size)
   const request = await axios
-    .get(
-      `https://whispering-forest-65400.herokuapp.com/api/photo/list/?pageNo=${1}&size=${size}`,
-    )
-    .then((response) => response.data)
-    .catch((err) => console.log('err', err));
+  .get(
+    `https://whispering-forest-65400.herokuapp.com/api/photo/list/?pageNo=${1}&size=${size}`,
+  )
+  .then((response) => response.data)
+  .catch((err) => console.log('err', err));
 
-  return {
-    type: PHOTO_LIST,
-    payload: request,
-  };
+return {
+  type: PHOTO_LIST,
+  payload: request,
+};
 }
+
+export function showLoader() {
+  return {
+    type: SHOW_LOADER
+  }
+}
+
+export function hideLoader() {
+  return {
+    type: HIDE_LOADER
+  }
+}
+export function showAlert(text) {
+  return dispatch => {
+    dispatch({
+      type: SHOW_ALERT,
+      payload: text
+    })
+
+    setTimeout(() => {
+      dispatch(hideAlert())
+    }, 3000)
+  }
+}
+
+export function hideAlert() {
+  return {
+    type: HIDE_ALERT
+  }
+}
+
 
 export async function submitPhotos(dataToSubmit) {
   console.log('dataToSubmit', dataToSubmit)

@@ -39,7 +39,6 @@ function ViewNotes({navigation}) {
     getData(size);
   }, [size]);
 
-  console.log('photoData', photoData);
 
   const footerList = () => {
     return size > photoData.length ? null : (

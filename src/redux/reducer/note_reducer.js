@@ -7,7 +7,6 @@ const initialState = {
 };
 
 function Reducer(state = initialState, action) {
-  console.log('state', state)
   switch (action.type) {
     case PHOTO_LIST:
       return {...state, photoData: action.payload};
